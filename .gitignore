@@ -5,6 +5,7 @@ bin/ffprobe.exe
 
 music
 processed
+out
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
