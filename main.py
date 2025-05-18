@@ -35,11 +35,14 @@ else:
 for subdir,dirs,files in os.walk(__music_path):
     for file in files:
         if len(subdir.split('\\')) == 1:
-            fileMetadata = json.loads(subprocess.getoutput(f"{__ffprobe_command} -v quiet -print_format json -show_format -show_streams \"{os.path.join(subdir,file)}\""))['format']['tags']
+            try:
+                fileMetadata = json.loads(subprocess.getoutput(f"{__ffprobe_command} -v quiet -print_format json -show_format -show_streams \"{os.path.join(subdir,file)}\""))['format']['tags']
     
-            __album_dir = os.path.join(os.path.join(__outdir,urlify(fileMetadata['album_artist'])),urlify(fileMetadata['album']))
+                __album_dir = os.path.join(os.path.join(__outdir,urlify(fileMetadata['album_artist'])),urlify(fileMetadata['album']))
     
-            if not(os.path.exists(__album_dir) and os.path.isdir(__album_dir)):
-                os.makedirs(__album_dir)
-            
-            shutil.move(os.path.join(subdir,file),os.path.join(__album_dir,file))
+                if not(os.path.exists(__album_dir) and os.path.isdir(__album_dir)):
+                    os.makedirs(__album_dir)
+                
+                shutil.move(os.path.join(subdir,file),os.path.join(__album_dir,file))
+            except KeyError:
+                pass
