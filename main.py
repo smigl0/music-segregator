@@ -3,6 +3,7 @@
 import sys,os,subprocess
 import json
 import shutil
+import shlex
 
 __dirname = os.getcwd()
 
@@ -18,7 +19,7 @@ elif sys.platform == "linux":
     __ffprobe_command = 'ffprobe'
 
 def urlify(urlString: str):
-    urlString = urlString.replace(" ","\\ ")
+    #urlString = urlString.replace(" ","\\ ")
     return urlString
 
 if(len(sys.argv)<3):
@@ -30,8 +31,16 @@ else:
 
 if __name__ == '__main__':
     for file in os.listdir(__music_path):
-        if os.path.isfile(os.path.join(__music_path,file)):
-            cmd = f"{__ffprobe_command} -v quiet -print_format json -show_format -show_streams \"{os.path.join(__music_path,file)}\""
+        if os.path.isfile(os.path.join(__music_path,file)): 
+            
+            #cmd = f"{__ffprobe_command} -v quiet -print_format json -show_format -show_streams \""+os.path.join(__music_path,file)+"\""
+            cmd = [
+            __ffprobe_command,
+            "-v", "quiet",
+            "-print_format", "json",
+            "-show_format",
+            "-show_streams",os.path.join(__music_path, file)]
+
             fileMetadata=json.loads(subprocess.run(cmd,capture_output=True, text=True).stdout)['format']['tags'] 
             try:
                 __album_dir = os.path.join(os.path.join(__outdir,urlify(fileMetadata['album_artist'])),urlify(fileMetadata['album']))
