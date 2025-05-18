@@ -2,6 +2,7 @@
 
 import sys,os,subprocess
 import json
+import shutil
 
 __dirname = os.getcwd()
 
@@ -41,4 +42,4 @@ for subdir,dirs,files in os.walk(__music_path):
             if not(os.path.exists(__album_dir) and os.path.isdir(__album_dir)):
                 os.makedirs(__album_dir)
             
-            os.rename(os.path.join(subdir,file),os.path.join(__album_dir,file))
+            shutil.move(os.path.join(subdir,file),os.path.join(__album_dir,file))
