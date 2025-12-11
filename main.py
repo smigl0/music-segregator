@@ -31,17 +31,18 @@ else:
 
 if __name__ == '__main__':
     for file in os.listdir(__music_path):
-        if os.path.isfile(os.path.join(__music_path,file)): 
-            
-            #cmd = f"{__ffprobe_command} -v quiet -print_format json -show_format -show_streams \""+os.path.join(__music_path,file)+"\""
+        print(os.path.splitext(file))
+        if os.path.isfile(os.path.join(__music_path,file)) and file.split('.')[-1] in ["mp3"]: 
+            print(file)         
             cmd = [
             __ffprobe_command,
             "-v", "quiet",
             "-print_format", "json",
             "-show_format",
             "-show_streams",os.path.join(__music_path, file)]
-
+    
             fileMetadata=json.loads(subprocess.run(cmd,capture_output=True, text=True).stdout)['format']['tags'] 
+            print(fileMetadata) 
             try:
                 __album_dir = os.path.join(os.path.join(__outdir,urlify(fileMetadata['album_artist'])),urlify(fileMetadata['album']))
             except KeyError:
