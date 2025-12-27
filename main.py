@@ -4,6 +4,7 @@ import sys,os,subprocess
 import json
 import shutil
 import shlex
+import re
 
 __dirname = os.getcwd()
 
@@ -19,8 +20,7 @@ elif sys.platform == "linux":
     __ffprobe_command = 'ffprobe'
 
 def urlify(urlString: str):
-    #urlString = urlString.replace(" ","\\ ")
-    return urlString
+    return re.sub(r'[\\/:*?"<>|\'`$&;(){}[\]#!~]', '', urlString)
 
 if(len(sys.argv)<2):
     raise KeyError('Please pass a path to segregate')
@@ -31,14 +31,9 @@ else:
     else:
         __outdir = sys.argv[2]
 
-
-
-
 if __name__ == '__main__':
     for file in os.listdir(__music_path):
-        print(os.path.splitext(file))
         if os.path.isfile(os.path.join(__music_path,file)) and file.split('.')[-1] in ["mp3"]: 
-            print(file)         
             cmd = [
                     __ffprobe_command,
                     "-v", "quiet",
@@ -47,7 +42,6 @@ if __name__ == '__main__':
                     "-show_streams",os.path.join(__music_path, file)]
 
             fileMetadata=json.loads(subprocess.run(cmd,capture_output=True, text=True).stdout)['format']['tags'] 
-            print(fileMetadata) 
             try:
                 __album_dir = os.path.join(os.path.join(__outdir,urlify(fileMetadata['album_artist'])),urlify(fileMetadata['album']))
             except KeyError:
@@ -55,6 +49,7 @@ if __name__ == '__main__':
                     __album_dir = os.path.join(os.path.join(__outdir,urlify(fileMetadata['artist'])),urlify(fileMetadata['album']))
                 except:
                     pass
+            print(__album_dir) 
             try:
                 if not(os.path.exists(__album_dir) and os.path.isdir(__album_dir)):
                     os.makedirs(__album_dir)
